@@ -52,15 +52,43 @@ func createMarks(rw http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	var subjects []Subject
+	if err := db.Raw("SELECT * FROM subject").Scan(&subjects).Error; err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
+	}
+	var options string
+	for _, subject := range subjects {
+		options += fmt.Sprintf(`<option value="%d">%s</option>`, subject.ID, subject.Title)
+	}
 	rw.Write([]byte(`
-	<body>
-	<form method="POST" action="/your-form-action-endpoint">
-	  <label>Name: </label><input required name="Student_id" type="number" /><br>
-	  <label>Lesson: </label><input required name="Subject_id" type="number" /><br>
-	  <label>Value: </label><input required name="Value" type="number" /><br>
+	<html>
+<body>
+
+
+ 
+ 
+	<form method="POST" action="/marks/create-new">
+	  <label>Name: </label>
+      <input required name="student_id" type="number" />
+      <br>
+      
+	  <label>Lesson: </label>
+       <select name="subject_id">
+    ` + options + `
+  </select>
+      <br>
+      
+	  <label>Value: </label>
+      <input required name="value" type="number" />
+      <br>
+      
 	  <button type="submit">Create</button>
 	</form>
-  </body>
+ 
+</body>
+</html>
+
 	`))
 }
 
