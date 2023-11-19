@@ -25,10 +25,17 @@ type Student struct {
 }
 
 type Mark struct {
-	ID         int
-	Student_Id int
-	Subject_Id int
-	Value      int
+	ID        int
+	StudentID int
+	SubjectID int
+	Value     int
+}
+
+type MarkResponse struct {
+	ID           int
+	StudentName  string
+	SubjectTitle string
+	Value        int
 }
 
 func createMarks(rw http.ResponseWriter, r *http.Request) {
@@ -58,8 +65,14 @@ func createMarks(rw http.ResponseWriter, r *http.Request) {
 }
 
 func getMarks(rw http.ResponseWriter, r *http.Request) {
-	var marks []Mark
-	if err := db.Raw("SELECT * FROM mark").Scan(&marks).Error; err != nil {
+	var marks []MarkResponse
+	if err := db.Raw(`
+	SELECT mark.id, student.name as student_name, subject.title as subject_title, mark.value 
+	FROM mark
+	     INNER JOIN student 
+		 ON mark.student_id = student.id 
+		 INNER JOIN subject 
+		 ON mark.subject_id = subject.id`).Scan(&marks).Error; err != nil {
 		http.Error(rw, err.Error(), 400)
 		return
 	}
@@ -68,7 +81,7 @@ func getMarks(rw http.ResponseWriter, r *http.Request) {
 		text = "no students"
 	}
 	for _, mark := range marks {
-		text += fmt.Sprintf("<p>%d. NameStudent: %d, subject: %d, value: %d</p>", mark.ID, mark.Student_Id, mark.Subject_Id, mark.Value)
+		text += fmt.Sprintf("<p>%d. NameStudent: %s, subject: %s, value: %d</p>", mark.ID, mark.StudentName, mark.SubjectTitle, mark.Value)
 	}
 	rw.Write([]byte(text))
 }
