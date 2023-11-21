@@ -40,7 +40,7 @@ type MarkResponse struct {
 
 func createMarks(rw http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
-		name := r.FormValue("student_id")
+		name := r.FormValue("Name")
 		lesson := r.FormValue("subject_id")
 		point := r.FormValue("value")
 
@@ -61,17 +61,26 @@ func createMarks(rw http.ResponseWriter, r *http.Request) {
 	for _, subject := range subjects {
 		options += fmt.Sprintf(`<option value="%d">%s</option>`, subject.ID, subject.Title)
 	}
+
+	var students []Student
+	if err := db.Raw("SELECT * FROM student").Scan(&students).Error; err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
+	}
+	var stdOptions string
+	for _, student := range students {
+		stdOptions += fmt.Sprintf(`<option value="%d">%s</option>`, student.ID, student.Name)
+	}
+
 	rw.Write([]byte(`
 	<html>
 <body>
-
-
- 
- 
 	<form method="POST" action="/marks/create-new">
-	  <label>Name: </label>
-      <input required name="student_id" type="number" />
-      <br>
+	<label>Name: </label>
+	<select name="Name">
+ ` + stdOptions + `
+</select>
+   <br>
       
 	  <label>Lesson: </label>
        <select name="subject_id">
