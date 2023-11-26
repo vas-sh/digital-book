@@ -38,6 +38,35 @@ type MarkResponse struct {
 	Value        int
 }
 
+type MrAverege struct {
+	ID    int
+	Name  string
+	Title string
+	Value float64
+}
+
+func AvgMarks(rw http.ResponseWriter, r *http.Request) {
+	var avgMr []MrAverege
+	if err := db.Raw(`
+	SELECT mark.id, student.name, subject.title, AVG(value) AS Value
+    FROM mark 
+        INNER JOIN student ON mark.student_id = student.id
+        INNER JOIN subject ON mark.subject_id = subject.id
+        GROUP BY mark.id, student.name, subject.title 
+		ORDER BY mark.id ASC`).Scan(&avgMr).Error; err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
+	}
+	text := ""
+	if len(avgMr) == 0 {
+		text = "field is empty"
+	}
+	for _, mark := range avgMr {
+		text += fmt.Sprintf("<p>%d Student name:  %s, Subject:  %s, Average mark:  %2f</p>", mark.ID, mark.Name, mark.Title, mark.Value)
+	}
+	rw.Write([]byte(text))
+}
+
 func createMarks(rw http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		name := r.FormValue("Name")
@@ -115,7 +144,7 @@ func getMarks(rw http.ResponseWriter, r *http.Request) {
 	}
 	text := ""
 	if len(marks) == 0 {
-		text = "no students"
+		text = "field is empty"
 	}
 	for _, mark := range marks {
 		text += fmt.Sprintf("<p>%d. NameStudent: %s, subject: %s, value: %d</p>", mark.ID, mark.StudentName, mark.SubjectTitle, mark.Value)
@@ -207,6 +236,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	http.HandleFunc("/marks/avg", AvgMarks)
 
 	http.HandleFunc("/marks", getMarks)
 	http.HandleFunc("/marks/create-new", createMarks)
