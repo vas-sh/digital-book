@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"text/template"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -69,7 +70,7 @@ func AvgMarks(rw http.ResponseWriter, r *http.Request) {
 
 func createMarks(rw http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
-		name := r.FormValue("Name")
+		name := r.FormValue("student_id")
 		lesson := r.FormValue("subject_id")
 		point := r.FormValue("value")
 
@@ -86,48 +87,24 @@ func createMarks(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, err.Error(), 400)
 		return
 	}
-	var options string
-	for _, subject := range subjects {
-		options += fmt.Sprintf(`<option value="%d">%s</option>`, subject.ID, subject.Title)
-	}
 
 	var students []Student
 	if err := db.Raw("SELECT * FROM student").Scan(&students).Error; err != nil {
 		http.Error(rw, err.Error(), 400)
 		return
 	}
-	var stdOptions string
-	for _, student := range students {
-		stdOptions += fmt.Sprintf(`<option value="%d">%s</option>`, student.ID, student.Name)
+
+	templ, err := template.ParseFiles("html/create-mark.html")
+	if err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
 	}
-
-	rw.Write([]byte(`
-	<html>
-<body>
-	<form method="POST" action="/marks/create-new">
-	<label>Name: </label>
-	<select name="Name">
- ` + stdOptions + `
-</select>
-   <br>
-      
-	  <label>Lesson: </label>
-       <select name="subject_id">
-    ` + options + `
-  </select>
-      <br>
-      
-	  <label>Value: </label>
-      <input required name="value" type="number" />
-      <br>
-      
-	  <button type="submit">Create</button>
-	</form>
- 
-</body>
-</html>
-
-	`))
+	templ.Execute(rw, struct {
+		Students []Student
+		Subjects []Subject
+	}{
+		Students: students, Subjects: subjects,
+	})
 }
 
 func getMarks(rw http.ResponseWriter, r *http.Request) {
@@ -197,15 +174,12 @@ func createStudent(rw http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	rw.Write([]byte(`
-	 <body>
-	  <form method="POST">
-	   <label>Name: </label><input required name="name" type="text" /></br>
-	   <label>Class: </label><input required name="class" type="number" /></br>
-	   <button action="submit">Create</button>
-	  </form>
-	 </body>
-	`))
+	templ, err := template.ParseFiles("html/create-student.html")
+	if err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
+	}
+	templ.Execute(rw, nil)
 }
 
 func createSubject(rw http.ResponseWriter, r *http.Request) {
