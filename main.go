@@ -122,6 +122,25 @@ func createMarks(rw http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func renderTemplate(fileName string, rw http.ResponseWriter, data any) {
+	templBase, err := template.ParseFiles("html/base.html")
+	if err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
+	}
+	templ, err := os.ReadFile(fileName)
+	if err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
+	}
+	_, err = templBase.Parse(string(templ))
+	if err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
+	}
+	templBase.Execute(rw, data)
+}
+
 func getMarks(rw http.ResponseWriter, r *http.Request) {
 	var marks []MarkResponse
 	if err := db.Raw(`
@@ -171,23 +190,13 @@ func getStudents(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	templ, err := template.ParseFiles("html/students.html")
-	if err != nil {
-		http.Error(rw, err.Error(), 400)
-		return
-	}
-
 	data := struct {
 		Students []Student
 	}{
 		Students: students,
 	}
+	renderTemplate("html/students.html", rw, data)
 
-	err = templ.Execute(rw, data)
-	if err != nil {
-		http.Error(rw, err.Error(), 400)
-		return
-	}
 }
 
 func getSubjects(rw http.ResponseWriter, r *http.Request) {
@@ -228,22 +237,7 @@ func createStudent(rw http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	templBase, err := template.ParseFiles("html/base.html")
-	if err != nil {
-		http.Error(rw, err.Error(), 400)
-		return
-	}
-	templ, err := os.ReadFile("html/create-student.html")
-	if err != nil {
-		http.Error(rw, err.Error(), 400)
-		return
-	}
-	_, err = templBase.Parse(string(templ))
-	if err != nil {
-		http.Error(rw, err.Error(), 400)
-		return
-	}
-	templBase.Execute(rw, nil)
+	renderTemplate("html/create-student.html", rw, nil)
 }
 
 func createSubject(rw http.ResponseWriter, r *http.Request) {

@@ -1,59 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            background-color: #ffffff; /* White background */
-            color: #14171a; /* Dark text color */
-            font-family: 'Arial', sans-serif;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }
-
-        table {
-            width: 80%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th, td {
-            border: 1px solid #e1e8ed; /* Light blue-gray border */
-            padding: 12px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #3498db; /* Modern Blue header background */
-            color: #ffffff; /* White text color */
-        }
-
-        tr:nth-child(even) {
-            background-color: #f5f8fa; /* Lighter blue-gray background for even rows */
-        }
-    </style>
-</head>
-<body>
-
-    <table>
+{{define "content"}}
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Class</th>
+    </tr>
+    {{range .Students}}
         <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Class</th>
+            <td>{{.ID}}</td>
+            <td>{{.Name}}</td>
+            <td>{{.Class}}</td>
         </tr>
-        {{range .Students}}
-            <tr>
-                <td>{{.ID}}</td>
-                <td>{{.Name}}</td>
-                <td>{{.Class}}</td>
-            </tr>
-        {{end}}
-    </table>
-
-</body>
-</html>
+    {{end}}
+</table>
+{{end}}
