@@ -228,23 +228,22 @@ func createStudent(rw http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	templBase, err := template.ParseFiles("html/create-student.html")
+	templBase, err := template.ParseFiles("html/base.html")
 	if err != nil {
 		http.Error(rw, err.Error(), 400)
 		return
 	}
-	pageTemplate := template.Must(templBase.Clone())
 	templ, err := os.ReadFile("html/create-student.html")
 	if err != nil {
 		http.Error(rw, err.Error(), 400)
 		return
 	}
-	_, err = pageTemplate.Parse(string(templ))
+	_, err = templBase.Parse(string(templ))
 	if err != nil {
 		http.Error(rw, err.Error(), 400)
 		return
 	}
-	pageTemplate.Execute(rw, nil)
+	templBase.Execute(rw, nil)
 }
 
 func createSubject(rw http.ResponseWriter, r *http.Request) {
