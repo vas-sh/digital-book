@@ -1,92 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      background-color: #ffffff; /* White background */
-      color: #14171a; /* Dark text color */
-      font-family: 'Arial', sans-serif;
-      text-align: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-    }
+{{define "content"}}
+<form method="POST" action="/students/create-new">
+  <h2>Add a new student</h2>
 
-    form {
-      max-width: 400px;
-      width: 100%;
-      background-color: #e1e8ed; /* Light blue-gray background */
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      text-align: left;
-      opacity: 0;
-      animation: fadeIn 1s ease-out forwards; /* Fade-in animation */
-    }
+  <label>Name: </label>
+  <input required name="name" type="text" />
 
-    h2 {
-      color: #3498db; /* Modern Blue */
-    }
+  <br>
 
-    label {
-      display: block;
-      margin-bottom: 8px;
-      color: #3498db; /* Modern Blue */
-    }
+  <label>Class: </label>
+  <input required name="class" type="number" />
 
-    input {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 16px;
-      box-sizing: border-box;
-      background-color: #ffffff;
-      border: 1px solid #3498db; /* Modern Blue */
-      border-radius: 4px;
-      color: #14171a; /* Dark text color */
-    }
+  <br>
 
-    button {
-      background-color: #3498db; /* Modern Blue */
-      color: #ffffff;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      float: right; /* Align button to the right */
-    }
-
-    button:hover {
-      background-color: #2980b9; /* Slightly darker shade of Modern Blue */
-    }
-
-    @keyframes fadeIn {
-      to {
-        opacity: 1;
-      }
-    }
-  </style>
-</head>
-<body>
-
-  <form method="POST" action="/students/create-new">
-    <h2>Add a new student</h2>
-
-    <label>Name: </label>
-    <input required name="name" type="text" />
-
-    <br>
-
-    <label>Class: </label>
-    <input required name="class" type="number" />
-
-    <br>
-
-    <button type="submit">Create</button>
-  </form>
-
-</body>
-</html>
+  <button type="submit">Create</button>
+</form>
+{{end}}

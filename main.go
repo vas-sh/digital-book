@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"text/template"
 
 	"gorm.io/driver/postgres"
@@ -227,12 +228,23 @@ func createStudent(rw http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	templ, err := template.ParseFiles("html/create-student.html")
+	templBase, err := template.ParseFiles("html/create-student.html")
 	if err != nil {
 		http.Error(rw, err.Error(), 400)
 		return
 	}
-	templ.Execute(rw, nil)
+	pageTemplate := template.Must(templBase.Clone())
+	templ, err := os.ReadFile("html/create-student.html")
+	if err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
+	}
+	_, err = pageTemplate.Parse(string(templ))
+	if err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
+	}
+	pageTemplate.Execute(rw, nil)
 }
 
 func createSubject(rw http.ResponseWriter, r *http.Request) {
