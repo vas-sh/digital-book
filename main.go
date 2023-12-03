@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"text/template"
@@ -49,23 +48,38 @@ type MrAverege struct {
 func AvgMarks(rw http.ResponseWriter, r *http.Request) {
 	var avgMr []MrAverege
 	if err := db.Raw(`
-	SELECT mark.id, student.name, subject.title, AVG(value) AS Value
-    FROM mark 
-        INNER JOIN student ON mark.student_id = student.id
-        INNER JOIN subject ON mark.subject_id = subject.id
-        GROUP BY mark.id, student.name, subject.title 
-		ORDER BY mark.id ASC`).Scan(&avgMr).Error; err != nil {
+		SELECT student.id, student.name, subject.title, AVG(value) AS Value
+	    FROM mark 
+	        INNER JOIN student ON mark.student_id = student.id
+	        INNER JOIN subject ON mark.subject_id = subject.id
+	        GROUP BY student.id, student.name, subject.title 
+			ORDER BY student.id ASC`).Scan(&avgMr).Error; err != nil {
 		http.Error(rw, err.Error(), 400)
 		return
 	}
-	text := ""
+
 	if len(avgMr) == 0 {
-		text = "field is empty"
+		http.Error(rw, "field is empty", http.StatusNotFound)
+		return
 	}
-	for _, mark := range avgMr {
-		text += fmt.Sprintf("<p>%d Student name:  %s, Subject:  %s, Average mark:  %2f</p>", mark.ID, mark.Name, mark.Title, mark.Value)
+
+	templ, err := template.ParseFiles("html/AVG-marks.html")
+	if err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
 	}
-	rw.Write([]byte(text))
+
+	data := struct {
+		AvgMarks []MrAverege
+	}{
+		AvgMarks: avgMr,
+	}
+
+	err = templ.Execute(rw, data)
+	if err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
+	}
 }
 
 func createMarks(rw http.ResponseWriter, r *http.Request) {
@@ -110,23 +124,38 @@ func createMarks(rw http.ResponseWriter, r *http.Request) {
 func getMarks(rw http.ResponseWriter, r *http.Request) {
 	var marks []MarkResponse
 	if err := db.Raw(`
-	SELECT mark.id, student.name as student_name, subject.title as subject_title, mark.value 
-	FROM mark
-	     INNER JOIN student 
-		 ON mark.student_id = student.id 
-		 INNER JOIN subject 
-		 ON mark.subject_id = subject.id`).Scan(&marks).Error; err != nil {
+		SELECT mark.id, student.name as student_name, subject.title as subject_title, mark.value 
+		FROM mark
+			 INNER JOIN student 
+			 ON mark.student_id = student.id 
+			 INNER JOIN subject 
+			 ON mark.subject_id = subject.id`).Scan(&marks).Error; err != nil {
 		http.Error(rw, err.Error(), 400)
 		return
 	}
-	text := ""
+
 	if len(marks) == 0 {
-		text = "field is empty"
+		http.Error(rw, "field is empty", http.StatusNotFound)
+		return
 	}
-	for _, mark := range marks {
-		text += fmt.Sprintf("<p>%d. NameStudent: %s, subject: %s, value: %d</p>", mark.ID, mark.StudentName, mark.SubjectTitle, mark.Value)
+
+	templ, err := template.ParseFiles("html/marks.html")
+	if err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
 	}
-	rw.Write([]byte(text))
+
+	data := struct {
+		Marks []MarkResponse
+	}{
+		Marks: marks,
+	}
+
+	err = templ.Execute(rw, data)
+	if err != nil {
+		http.Error(rw, err.Error(), 500)
+		return
+	}
 }
 
 func getStudents(rw http.ResponseWriter, r *http.Request) {
@@ -135,14 +164,29 @@ func getStudents(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, err.Error(), 400)
 		return
 	}
-	text := ""
+
 	if len(students) == 0 {
-		text = "no students"
+		http.Error(rw, "no students", http.StatusNotFound)
+		return
 	}
-	for _, student := range students {
-		text += fmt.Sprintf("<p>%d. Name: %s, Class: %s</p>", student.ID, student.Name, student.Class)
+
+	templ, err := template.ParseFiles("html/students.html")
+	if err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
 	}
-	rw.Write([]byte(text))
+
+	data := struct {
+		Students []Student
+	}{
+		Students: students,
+	}
+
+	err = templ.Execute(rw, data)
+	if err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
+	}
 }
 
 func getSubjects(rw http.ResponseWriter, r *http.Request) {
@@ -151,14 +195,23 @@ func getSubjects(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, err.Error(), 400)
 		return
 	}
-	text := ""
-	if len(subjects) == 0 {
-		text = "no students"
+
+	templ, err := template.ParseFiles("html/subjects.html")
+	if err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
 	}
-	for _, subject := range subjects {
-		text += fmt.Sprintf("<p>%d Subject: %s</p>", subject.ID, subject.Title)
+
+	data := struct {
+		Subjects []Subject
+	}{
+		Subjects: subjects,
 	}
-	rw.Write([]byte(text))
+
+	if err := templ.Execute(rw, data); err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
+	}
 }
 
 func createStudent(rw http.ResponseWriter, r *http.Request) {
@@ -184,24 +237,22 @@ func createStudent(rw http.ResponseWriter, r *http.Request) {
 
 func createSubject(rw http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
-		title := r.FormValue("title")
+		title := r.FormValue("subject")
 
 		log.Println("new subject: title", title)
 
-		if err := db.Exec("INSERT INTO subject (title) VALUES(?)",
+		if err := db.Exec("INSERT INTO subject (ID, title) VALUES(DEFAULT, ?)",
 			title).Error; err != nil {
 			http.Error(rw, err.Error(), 400)
 			return
 		}
 	}
-	rw.Write([]byte(`
-	 <body>
-	  <form method="POST">
-	   <label>Title: </label><input required name="title" type="text" /></br>
-	   <button action="submit">Create</button>
-	  </form>
-	 </body>
-	`))
+	templ, err := template.ParseFiles("html/create-subject.html")
+	if err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
+	}
+	templ.Execute(rw, nil)
 }
 
 func main() {
