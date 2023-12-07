@@ -16,12 +16,9 @@
     </thead>
     <tbody>
         {{range .Subjects}}
-            <tr>
+            <tr onclick="window.location.href = '/subjects/create-new?id={{.ID}}'">
                 <td>{{.ID}}</td>
                 <td>{{.Title}}</td>
-               <td>
-                    <a href="/subjects/create-new?id={{.ID}}">Edit</a>
-                </td>
             </tr>
         {{end}}
     </tbody>

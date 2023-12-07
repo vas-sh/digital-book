@@ -245,47 +245,50 @@ func createStudent(rw http.ResponseWriter, r *http.Request) {
 }
 
 func createSubject(rw http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
-		title := r.FormValue("subject")
+	log.Println("createSubject", r.Method)
 
-		log.Println("new subject: title", title)
+	switch r.Method {
+	case http.MethodPost:
 
-		if err := db.Exec("INSERT INTO subject (ID, title) VALUES(DEFAULT, ?)",
-			title).Error; err != nil {
-			http.Error(rw, err.Error(), 400)
-			return
-		}
-		getSubjects(rw, r)
-		return
-	} else if r.Method == http.MethodPatch {
 		title := r.FormValue("subject")
 		id := r.FormValue("id")
-		log.Println("updade subject: title", title, id)
 
-		if err := db.Exec("UPDATE subject SET title = ? WHERE id = ?",
-			title, id).Error; err != nil {
-			http.Error(rw, err.Error(), 400)
-			return
+		if id == "" || id == "0" {
+			log.Println("new subject: title", title)
+			if err := db.Exec("INSERT INTO subject (ID, title) VALUES(DEFAULT, ?)",
+				title).Error; err != nil {
+				http.Error(rw, err.Error(), 400)
+				return
+			}
+		} else {
+			log.Println("updade subject: title", title, id)
+			if err := db.Exec("UPDATE subject SET title = ? WHERE id = ?",
+				title, id).Error; err != nil {
+				http.Error(rw, err.Error(), 400)
+				return
+			}
 		}
+
 		getSubjects(rw, r)
 		return
-	}
-	id := r.URL.Query().Get("id")
-	var subject Subject
-	var method = http.MethodPost
-	if id != "" {
-		if err := db.Raw("SELECT * FROM subject WHERE id = ?", id).Scan(&subject).Error; err != nil {
-			http.Error(rw, err.Error(), 400)
-			return
+
+	case http.MethodGet:
+
+		if id := r.URL.Query().Get("id"); id != "" {
+			var subject Subject
+			if err := db.Raw("SELECT * FROM subject WHERE id = ?", id).Scan(&subject).Error; err != nil {
+				http.Error(rw, err.Error(), 400)
+				return
+			}
+			renderTemplate("html/update-subject.html", rw, struct {
+				Subject Subject
+			}{
+				Subject: subject,
+			})
+		} else {
+			renderTemplate("html/create-subject.html", rw, nil)
 		}
-		method = http.MethodPatch
 	}
-	renderTemplate("html/create-subject.html", rw, struct {
-		Subject Subject
-		Method  string
-	}{
-		Subject: subject, Method: method,
-	})
 }
 
 func main() {

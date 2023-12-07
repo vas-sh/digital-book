@@ -1,12 +1,11 @@
 {{define "content"}}
-<form method="{{.Method}}" action="/subjects/create-new">
+<form method="POST" action="/subjects/create-new">
   <h2>Add a new subject</h2>
 
   <label>Title: </label>
-  <input required name="subject" type="text" value="{{.Subject.Title}}" />
-  <input hidden name="id" type="text" value="{{.Subject.ID}}"/>
+  <input required name="subject" type="text" />
   <br>
 
-  <button type="submit">Create</button>
+  <button type="submit">Add</button>
 </form>
 {{end}}
