@@ -257,14 +257,35 @@ func createSubject(rw http.ResponseWriter, r *http.Request) {
 		}
 		getSubjects(rw, r)
 		return
-	}
-	templ, err := template.ParseFiles("html/create-subject.html")
-	if err != nil {
-		http.Error(rw, err.Error(), 400)
+	} else if r.Method == http.MethodPatch {
+		title := r.FormValue("subject")
+		id := r.FormValue("id")
+		log.Println("updade subject: title", title, id)
+
+		if err := db.Exec("UPDATE subject SET title = ? WHERE id = ?",
+			title, id).Error; err != nil {
+			http.Error(rw, err.Error(), 400)
+			return
+		}
+		getSubjects(rw, r)
 		return
 	}
-	templ.Execute(rw, nil)
-	renderTemplate("html/create-subject.html", rw, nil)
+	id := r.URL.Query().Get("id")
+	var subject Subject
+	var method = http.MethodPost
+	if id != "" {
+		if err := db.Raw("SELECT * FROM subject WHERE id = ?", id).Scan(&subject).Error; err != nil {
+			http.Error(rw, err.Error(), 400)
+			return
+		}
+		method = http.MethodPatch
+	}
+	renderTemplate("html/create-subject.html", rw, struct {
+		Subject Subject
+		Method  string
+	}{
+		Subject: subject, Method: method,
+	})
 }
 
 func main() {
