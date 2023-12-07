@@ -75,12 +75,14 @@ func AvgMarks(rw http.ResponseWriter, r *http.Request) {
 	}{
 		AvgMarks: avgMr,
 	}
+	renderTemplate("html/AVG-marks.html", rw, data)
 
 	err = templ.Execute(rw, data)
 	if err != nil {
 		http.Error(rw, err.Error(), 400)
 		return
 	}
+
 }
 
 func createMarks(rw http.ResponseWriter, r *http.Request) {
@@ -89,14 +91,17 @@ func createMarks(rw http.ResponseWriter, r *http.Request) {
 		lesson := r.FormValue("subject_id")
 		point := r.FormValue("value")
 
-		log.Println("new student: name", name, "class", lesson)
+		log.Println("new mark: student_id", name, "subject_id", lesson, "value", point)
 
 		if err := db.Exec("INSERT INTO mark(student_id, subject_id, value) VALUES(?, ?, ?)",
 			name, lesson, point).Error; err != nil {
 			http.Error(rw, err.Error(), 400)
 			return
 		}
+		getMarks(rw, r)
+		return
 	}
+
 	var subjects []Subject
 	if err := db.Raw("SELECT * FROM subject").Scan(&subjects).Error; err != nil {
 		http.Error(rw, err.Error(), 400)
@@ -109,12 +114,7 @@ func createMarks(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	templ, err := template.ParseFiles("html/create-mark.html")
-	if err != nil {
-		http.Error(rw, err.Error(), 400)
-		return
-	}
-	templ.Execute(rw, struct {
+	renderTemplate("html/create-mark.html", rw, struct {
 		Students []Student
 		Subjects []Subject
 	}{
@@ -170,6 +170,7 @@ func getMarks(rw http.ResponseWriter, r *http.Request) {
 	}{
 		Marks: marks,
 	}
+	renderTemplate("html/marks.html", rw, data)
 
 	err = templ.Execute(rw, data)
 	if err != nil {
@@ -217,6 +218,7 @@ func getSubjects(rw http.ResponseWriter, r *http.Request) {
 	}{
 		Subjects: subjects,
 	}
+	renderTemplate("html/subjects.html", rw, data)
 
 	if err := templ.Execute(rw, data); err != nil {
 		http.Error(rw, err.Error(), 400)
@@ -236,6 +238,8 @@ func createStudent(rw http.ResponseWriter, r *http.Request) {
 			http.Error(rw, err.Error(), 400)
 			return
 		}
+		getStudents(rw, r)
+		return
 	}
 	renderTemplate("html/create-student.html", rw, nil)
 }
@@ -251,6 +255,8 @@ func createSubject(rw http.ResponseWriter, r *http.Request) {
 			http.Error(rw, err.Error(), 400)
 			return
 		}
+		getSubjects(rw, r)
+		return
 	}
 	templ, err := template.ParseFiles("html/create-subject.html")
 	if err != nil {
@@ -258,6 +264,7 @@ func createSubject(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	templ.Execute(rw, nil)
+	renderTemplate("html/create-subject.html", rw, nil)
 }
 
 func main() {
