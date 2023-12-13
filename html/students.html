@@ -1,16 +1,25 @@
 {{define "content"}}
+<div>
+    <div>
+        <a href="/students/create-new" class="add-button">Add student</a>
+    </div>
+</div>
 <table>
-    <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Class</th>
-    </tr>
-    {{range .Students}}
+    <thead>
         <tr>
-            <td>{{.ID}}</td>
-            <td>{{.Name}}</td>
-            <td>{{.Class}}</td>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Class</th>
         </tr>
-    {{end}}
+    </thead>
+    <tbody>
+        {{range .Students}}
+            <tr onclick="window.location.href = '/students/create-new?id={{.ID}}'">
+                <td>{{.ID}}</td>
+                <td>{{.Name}}</td>
+                <td>{{.Class}}</td>
+            </tr>
+        {{end}}
+    </tbody>
 </table>
 {{end}}

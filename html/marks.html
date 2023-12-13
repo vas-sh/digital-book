@@ -1,18 +1,27 @@
 {{define "content"}}
+<div>
+    <div>
+        <a href="/marks/create-new" class="add-button">Add marks</a>
+    </div>
+</div>
 <table>
-    <tr>
-        <th>ID</th>
-        <th>NameStudent</th>
-        <th>Subject</th>
-        <th>Value</th>
-    </tr>
-    {{range .Marks}}
+    <thead>
         <tr>
-            <td>{{.ID}}</td>
-            <td>{{.StudentName}}</td>
-            <td>{{.SubjectTitle}}</td>
-            <td>{{.Value}}</td>
+            <th>ID</th>
+            <th>NameStudent</th>
+            <th>Subject</th>
+            <th>Value</th>
         </tr>
-    {{end}}
+    </thead>
+    <tbody>
+        {{range .Marks}}
+            <tr onclick="window.location.href = '/marks/create-new?id={{.ID}}'">
+                <td>{{.ID}}</td>
+                <td>{{.StudentName}}</td>
+                <td>{{.SubjectTitle}}</td>
+                <td>{{.Value}}</td>
+            </tr>
+        {{end}}
+    </tbody>
 </table>
 {{end}}

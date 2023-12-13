@@ -1,0 +1,30 @@
+{{define "content"}}
+<form method="POST" action="/marks/create-new">
+  <h2>Update </h2>
+  <label>Name: </label>
+  <select name="student_id" >
+    {{range .Students }}
+      <option value="{{ .ID }}">{{ .Name }}</option>
+    {{end}}
+  </select>
+
+  <br>
+
+  <label>Lesson: </label>
+  <select name="subject_id" value="{{.Mark.SubjectID}}">
+    {{range .Subjects }}
+      <option value="{{ .ID }}">{{ .Title }}</option>
+    {{end}}
+  </select>
+  <br>
+
+  <label>Value: </label>
+  <input required name="value" type="text" value="{{.Mark.Value}}" />
+  <br>
+
+  <input hidden name="id" type="text" value="{{.Mark.ID}}"/>
+  <br>
+  
+  <button type="submit">Update</button>
+</form>
+{{end}}
