@@ -185,11 +185,6 @@ func getMarks(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(marks) == 0 {
-		http.Error(rw, "field is empty", http.StatusNotFound)
-		return
-	}
-
 	templ, err := template.ParseFiles("html/marks.html")
 	if err != nil {
 		http.Error(rw, err.Error(), 400)

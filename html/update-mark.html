@@ -3,8 +3,9 @@
   <h2>Update </h2>
   <label>Name: </label>
   <select name="student_id" >
+    {{ $studentID := .Mark.StudentID }}
     {{range .Students }}
-      <option value="{{ .ID }}">{{ .Name }}</option>
+      <option {{ if eq .ID $studentID }} selected {{ end }} value="{{ .ID }}">{{ .Name }}</option>
     {{end}}
   </select>
 
