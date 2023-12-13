@@ -11,6 +11,7 @@
             <th>NameStudent</th>
             <th>Subject</th>
             <th>Value</th>
+            <th>Delete</th>
         </tr>
     </thead>
     <tbody>
@@ -20,6 +21,7 @@
                 <td>{{.StudentName}}</td>
                 <td>{{.SubjectTitle}}</td>
                 <td>{{.Value}}</td>
+                <td><a href="/marks/delete?id={{ .ID }}">Delete</a></td>
             </tr>
         {{end}}
     </tbody>

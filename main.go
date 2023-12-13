@@ -111,7 +111,7 @@ func createMarks(rw http.ResponseWriter, r *http.Request) {
 			}
 
 		}
-		getMarks(rw, r)
+		http.Redirect(rw, r, "/marks", http.StatusTemporaryRedirect)
 		return
 
 	case http.MethodGet:
@@ -343,6 +343,23 @@ func createSubject(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func deleteMark(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "not supported", http.StatusNotImplemented)
+		return
+	}
+	id := r.URL.Query().Get("id")
+	if id == "" {
+		http.Error(w, "id is required", http.StatusBadRequest)
+		return
+	}
+	if err := db.Exec("DELETE FROM mark WHERE id = ?", id).Error; err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, "/marks", http.StatusTemporaryRedirect)
+}
+
 func main() {
 	var err error
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -353,6 +370,7 @@ func main() {
 
 	http.HandleFunc("/marks", getMarks)
 	http.HandleFunc("/marks/create-new", createMarks)
+	http.HandleFunc("/marks/delete", deleteMark)
 
 	http.HandleFunc("/subjects", getSubjects)
 	http.HandleFunc("/subjects/create-new", createSubject)
