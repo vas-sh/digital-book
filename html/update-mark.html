@@ -12,9 +12,10 @@
   <br>
 
   <label>Lesson: </label>
-  <select name="subject_id" value="{{.Mark.SubjectID}}">
+  <select name="subject_id">
+    {{ $subjectID := .Mark.SubjectID }}
     {{range .Subjects }}
-      <option value="{{ .ID }}">{{ .Title }}</option>
+      <option {{ if eq .ID $subjectID }} selected {{ end }} value="{{ .ID }}">{{ .Title }}</option>
     {{end}}
   </select>
   <br>
