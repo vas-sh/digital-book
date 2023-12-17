@@ -1,6 +1,9 @@
 package main
 
 import (
+	"digital-book/internal/handlers"
+	"digital-book/internal/repo"
+	"digital-book/internal/types"
 	"log"
 	"net/http"
 	"os"
@@ -14,17 +17,7 @@ const dsn = "host=localhost user=user password=1111 dbname=test port=5432 sslmod
 
 var db *gorm.DB
 
-type Subject struct {
-	ID    int
-	Title string
-}
-
-type Student struct {
-	ID    int
-	Name  string
-	Class string
-}
-
+// TODO: move Mark, MarkReponse, MrAverege to the types/mark.go
 type Mark struct {
 	ID        int
 	StudentID int
@@ -46,6 +39,26 @@ type MrAverege struct {
 	Value float64
 }
 
+func renderTemplate(fileName string, rw http.ResponseWriter, data any) {
+	templBase, err := template.ParseFiles("html/base.html")
+	if err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
+	}
+	templ, err := os.ReadFile(fileName)
+	if err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
+	}
+	_, err = templBase.Parse(string(templ))
+	if err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
+	}
+	templBase.Execute(rw, data)
+}
+
+// TODO: move to handlers/mark.go
 func AvgMarks(rw http.ResponseWriter, r *http.Request) {
 	var avgMr []MrAverege
 	if err := db.Raw(`
@@ -85,6 +98,7 @@ func AvgMarks(rw http.ResponseWriter, r *http.Request) {
 
 }
 
+// TODO: move to handlers/mark.go
 func createMarks(rw http.ResponseWriter, r *http.Request) {
 	log.Println("createMark", r.Method)
 
@@ -115,13 +129,13 @@ func createMarks(rw http.ResponseWriter, r *http.Request) {
 		return
 
 	case http.MethodGet:
-		var subjects []Subject
+		var subjects []types.Subject
 		if err := db.Raw("SELECT * FROM subject").Scan(&subjects).Error; err != nil {
 			http.Error(rw, err.Error(), 400)
 			return
 		}
 
-		var students []Student
+		var students []types.Student
 		if err := db.Raw("SELECT * FROM student").Scan(&students).Error; err != nil {
 			http.Error(rw, err.Error(), 400)
 			return
@@ -134,8 +148,8 @@ func createMarks(rw http.ResponseWriter, r *http.Request) {
 			}
 			renderTemplate("html/update-mark.html", rw, struct {
 				Mark     Mark
-				Students []Student
-				Subjects []Subject
+				Students []types.Student
+				Subjects []types.Subject
 			}{
 				Mark:     mark,
 				Students: students, Subjects: subjects,
@@ -143,8 +157,8 @@ func createMarks(rw http.ResponseWriter, r *http.Request) {
 		} else {
 
 			renderTemplate("html/create-mark.html", rw, struct {
-				Students []Student
-				Subjects []Subject
+				Students []types.Student
+				Subjects []types.Subject
 			}{
 				Students: students, Subjects: subjects,
 			})
@@ -152,25 +166,7 @@ func createMarks(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func renderTemplate(fileName string, rw http.ResponseWriter, data any) {
-	templBase, err := template.ParseFiles("html/base.html")
-	if err != nil {
-		http.Error(rw, err.Error(), 400)
-		return
-	}
-	templ, err := os.ReadFile(fileName)
-	if err != nil {
-		http.Error(rw, err.Error(), 400)
-		return
-	}
-	_, err = templBase.Parse(string(templ))
-	if err != nil {
-		http.Error(rw, err.Error(), 400)
-		return
-	}
-	templBase.Execute(rw, data)
-}
-
+// TODO: move to handlers/mark.go
 func getMarks(rw http.ResponseWriter, r *http.Request) {
 	var marks []MarkResponse
 	if err := db.Raw(`
@@ -205,97 +201,7 @@ func getMarks(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getStudents(rw http.ResponseWriter, r *http.Request) {
-	var students []Student
-	if err := db.Raw("SELECT * FROM student ORDER BY id ASC").Scan(&students).Error; err != nil {
-		http.Error(rw, err.Error(), 400)
-		return
-	}
-
-	if len(students) == 0 {
-		http.Error(rw, "no students", http.StatusNotFound)
-		return
-	}
-
-	data := struct {
-		Students []Student
-	}{
-		Students: students,
-	}
-	renderTemplate("html/students.html", rw, data)
-
-}
-
-func getSubjects(rw http.ResponseWriter, r *http.Request) {
-	var subjects []Subject
-	if err := db.Raw("SELECT * FROM subject ORDER BY id").Scan(&subjects).Error; err != nil {
-		http.Error(rw, err.Error(), 400)
-		return
-	}
-
-	templ, err := template.ParseFiles("html/subjects.html")
-	if err != nil {
-		http.Error(rw, err.Error(), 400)
-		return
-	}
-
-	data := struct {
-		Subjects []Subject
-	}{
-		Subjects: subjects,
-	}
-	renderTemplate("html/subjects.html", rw, data)
-
-	if err := templ.Execute(rw, data); err != nil {
-		http.Error(rw, err.Error(), 400)
-		return
-	}
-}
-
-func createStudent(rw http.ResponseWriter, r *http.Request) {
-	log.Println("createStudent", r.Method)
-
-	switch r.Method {
-	case http.MethodPost:
-		class := r.FormValue("class")
-		name := r.FormValue("name")
-		id := r.FormValue("id")
-
-		if id == "" {
-			log.Println("new student: name", name, "class", class)
-			if err := db.Exec("INSERT INTO student (name, class) VALUES (?, ?)", name, class).Error; err != nil {
-				http.Error(rw, err.Error(), 400)
-				return
-			}
-		} else {
-			log.Println("update student: name", name, "class", class, "id", id)
-			if err := db.Exec("UPDATE student SET name = ?, class = ? WHERE id = ?", name, class, id).Error; err != nil {
-				http.Error(rw, err.Error(), 400)
-				return
-			}
-		}
-
-		http.Redirect(rw, r, "/students", http.StatusTemporaryRedirect)
-		return
-
-	case http.MethodGet:
-		if id := r.URL.Query().Get("id"); id != "" {
-			var student Student
-			if err := db.Raw("SELECT * FROM student WHERE id = ?", id).Scan(&student).Error; err != nil {
-				http.Error(rw, err.Error(), 400)
-				return
-			}
-			renderTemplate("html/update-student.html", rw, struct {
-				Student Student
-			}{
-				Student: student,
-			})
-		} else {
-			renderTemplate("html/create-student.html", rw, nil)
-		}
-	}
-}
-
+// TODO: move handlers/subject.go
 func createSubject(rw http.ResponseWriter, r *http.Request) {
 	log.Println("createSubject", r.Method)
 
@@ -327,13 +233,13 @@ func createSubject(rw http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 
 		if id := r.URL.Query().Get("id"); id != "" {
-			var subject Subject
+			var subject types.Subject
 			if err := db.Raw("SELECT * FROM subject WHERE id = ?", id).Scan(&subject).Error; err != nil {
 				http.Error(rw, err.Error(), 400)
 				return
 			}
 			renderTemplate("html/update-subject.html", rw, struct {
-				Subject Subject
+				Subject types.Subject
 			}{
 				Subject: subject,
 			})
@@ -343,6 +249,7 @@ func createSubject(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// TODO: move to handlers/mark.go
 func deleteMark(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "not supported", http.StatusNotImplemented)
@@ -360,6 +267,7 @@ func deleteMark(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/marks", http.StatusTemporaryRedirect)
 }
 
+// TODO: Move to handlers/student.go
 func deleteStudent(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "not supported", http.StatusNotImplemented)
@@ -377,6 +285,7 @@ func deleteStudent(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/students", http.StatusTemporaryRedirect)
 }
 
+// TODO: move to handlers/subject.go
 func deleteSubject(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "not supported", http.StatusNotImplemented)
@@ -400,18 +309,22 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	rep := repo.New(db)
+	server := handlers.New(rep)
+
 	http.HandleFunc("/marks/avg", AvgMarks)
 
 	http.HandleFunc("/marks", getMarks)
 	http.HandleFunc("/marks/create-new", createMarks)
 	http.HandleFunc("/marks/delete", deleteMark)
 
-	http.HandleFunc("/subjects", getSubjects)
+	http.HandleFunc("/subjects", server.GetSubjects)
 	http.HandleFunc("/subjects/create-new", createSubject)
 	http.HandleFunc("/subjects/delete", deleteSubject)
 
-	http.HandleFunc("/students/create-new", createStudent)
-	http.HandleFunc("/students", getStudents)
+	http.HandleFunc("/students/create-new", server.CreateStudent)
+	http.HandleFunc("/students", server.GetStudents)
 	http.HandleFunc("/students/delete", deleteStudent)
 
 	log.Println("start")
