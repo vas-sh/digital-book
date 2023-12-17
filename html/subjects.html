@@ -9,6 +9,7 @@
         <tr>
             <th>ID</th>
             <th>Subject Title</th>
+            <th>Delete</th>
         </tr>
     </thead>
     <tbody>
@@ -16,6 +17,7 @@
             <tr onclick="window.location.href = '/subjects/create-new?id={{.ID}}'">
                 <td>{{.ID}}</td>
                 <td>{{.Title}}</td>
+                <td><a href="/subjects/delete?id={{ .ID }}">Delete</a></td>
             </tr>
         {{end}}
     </tbody>
