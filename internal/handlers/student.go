@@ -70,3 +70,21 @@ func (s *server) CreateStudent(rw http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+
+func (s *server) DeleteStudent(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	if r.Method != http.MethodGet {
+		http.Error(w, "not supported", http.StatusNotImplemented)
+		return
+	}
+	id := r.URL.Query().Get("id")
+	if id == "" {
+		http.Error(w, "id is required", http.StatusBadRequest)
+		return
+	}
+	if err := s.repo.DeleteStudent(ctx, id); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, "/students", http.StatusTemporaryRedirect)
+}

@@ -17,6 +17,9 @@ type repo interface {
 	GetSubjects(ctx context.Context) (res []types.Subject, err error)
 
 	UpdateSubject(ctx context.Context, title, id string) error
+
+	DeleteSubject(ctx context.Context, id string) error
+	DeleteStudent(ctx context.Context, id string) error
 }
 
 type server struct {

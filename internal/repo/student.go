@@ -22,3 +22,7 @@ func (r *repo) GetStudent(ctx context.Context, id string) (res types.Student, er
 	err = r.db.WithContext(ctx).Raw("SELECT * FROM student WHERE id = ?", id).Scan(&res).Error
 	return
 }
+
+func (r *repo) DeleteStudent(ctx context.Context, id string) error {
+	return r.db.WithContext(ctx).Exec("DELETE FROM student WHERE id = ?", id).Error
+}

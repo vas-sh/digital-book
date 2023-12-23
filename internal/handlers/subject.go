@@ -81,3 +81,22 @@ func (s *server) CreateSubject(rw http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+
+func (s *server) DeleteSubject(rw http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	if r.Method != http.MethodGet {
+		http.Error(rw, "not supported", http.StatusNotImplemented)
+		return
+	}
+	id := r.URL.Query().Get("id")
+	if id == "" {
+		http.Error(rw, "id is required", http.StatusBadRequest)
+		return
+	}
+	if err := s.repo.DeleteSubject(ctx, id); err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(rw, r, "/subjects", http.StatusTemporaryRedirect)
+}

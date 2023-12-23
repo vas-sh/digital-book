@@ -17,3 +17,7 @@ func (r *repo) CreateSubject(ctx context.Context, title string) error {
 func (r *repo) UpdateSubject(ctx context.Context, title, id string) error {
 	return r.db.WithContext(ctx).Exec("UPDATE subject SET title = ? WHERE id = ?", title, id).Error
 }
+
+func (r *repo) DeleteSubject(ctx context.Context, id string) error {
+	return r.db.WithContext(ctx).Exec("DELETE FROM subject WHERE id = ?", id).Error
+}

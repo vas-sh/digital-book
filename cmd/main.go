@@ -221,42 +221,6 @@ func deleteMark(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/marks", http.StatusTemporaryRedirect)
 }
 
-// TODO: Move to handlers/student.go
-func deleteStudent(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "not supported", http.StatusNotImplemented)
-		return
-	}
-	id := r.URL.Query().Get("id")
-	if id == "" {
-		http.Error(w, "id is required", http.StatusBadRequest)
-		return
-	}
-	if err := db.Exec("DELETE FROM student WHERE id = ?", id).Error; err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	http.Redirect(w, r, "/students", http.StatusTemporaryRedirect)
-}
-
-// TODO: move to handlers/subject.go
-func deleteSubject(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "not supported", http.StatusNotImplemented)
-		return
-	}
-	id := r.URL.Query().Get("id")
-	if id == "" {
-		http.Error(w, "id is required", http.StatusBadRequest)
-		return
-	}
-	if err := db.Exec("DELETE FROM subject WHERE id = ?", id).Error; err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	http.Redirect(w, r, "/subjects", http.StatusTemporaryRedirect)
-}
-
 func main() {
 	var err error
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -275,11 +239,11 @@ func main() {
 
 	http.HandleFunc("/subjects", server.GetSubjects)
 	http.HandleFunc("/subjects/create-new", server.CreateSubject)
-	http.HandleFunc("/subjects/delete", deleteSubject)
+	http.HandleFunc("/subjects/delete", server.DeleteSubject)
 
 	http.HandleFunc("/students/create-new", server.CreateStudent)
 	http.HandleFunc("/students", server.GetStudents)
-	http.HandleFunc("/students/delete", deleteStudent)
+	http.HandleFunc("/students/delete", server.DeleteStudent)
 
 	log.Println("start")
 	http.ListenAndServe(":5005", nil)
