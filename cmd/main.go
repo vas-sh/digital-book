@@ -202,52 +202,6 @@ func getMarks(rw http.ResponseWriter, r *http.Request) {
 }
 
 // TODO: move handlers/subject.go
-func createSubject(rw http.ResponseWriter, r *http.Request) {
-	log.Println("createSubject", r.Method)
-
-	switch r.Method {
-	case http.MethodPost:
-
-		title := r.FormValue("subject")
-		id := r.FormValue("id")
-
-		if id == "" || id == "0" {
-			log.Println("new subject: title", title)
-			if err := db.Exec("INSERT INTO subject (ID, title) VALUES(DEFAULT, ?)",
-				title).Error; err != nil {
-				http.Error(rw, err.Error(), 400)
-				return
-			}
-		} else {
-			log.Println("updade subject: title", title, id)
-			if err := db.Exec("UPDATE subject SET title = ? WHERE id = ?",
-				title, id).Error; err != nil {
-				http.Error(rw, err.Error(), 400)
-				return
-			}
-		}
-
-		http.Redirect(rw, r, "/subjects", http.StatusTemporaryRedirect)
-		return
-
-	case http.MethodGet:
-
-		if id := r.URL.Query().Get("id"); id != "" {
-			var subject types.Subject
-			if err := db.Raw("SELECT * FROM subject WHERE id = ?", id).Scan(&subject).Error; err != nil {
-				http.Error(rw, err.Error(), 400)
-				return
-			}
-			renderTemplate("html/update-subject.html", rw, struct {
-				Subject types.Subject
-			}{
-				Subject: subject,
-			})
-		} else {
-			renderTemplate("html/create-subject.html", rw, nil)
-		}
-	}
-}
 
 // TODO: move to handlers/mark.go
 func deleteMark(w http.ResponseWriter, r *http.Request) {
@@ -320,7 +274,7 @@ func main() {
 	http.HandleFunc("/marks/delete", deleteMark)
 
 	http.HandleFunc("/subjects", server.GetSubjects)
-	http.HandleFunc("/subjects/create-new", createSubject)
+	http.HandleFunc("/subjects/create-new", server.CreateSubject)
 	http.HandleFunc("/subjects/delete", deleteSubject)
 
 	http.HandleFunc("/students/create-new", server.CreateStudent)

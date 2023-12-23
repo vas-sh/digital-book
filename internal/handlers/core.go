@@ -13,8 +13,10 @@ type repo interface {
 	GetStudent(ctx context.Context, id string) (res types.Student, err error)
 	CreateStudent(ctx context.Context, name, class string) error
 	UpdateStudent(ctx context.Context, name, class, id string) error
-
+	CreateSubject(ctx context.Context, title string) error
 	GetSubjects(ctx context.Context) (res []types.Subject, err error)
+
+	UpdateSubject(ctx context.Context, title, id string) error
 }
 
 type server struct {
