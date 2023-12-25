@@ -25,6 +25,7 @@ type repo interface {
 	GetMarks(ctx context.Context) (res []types.MarkResponse, err error)
 	GetMark(ctx context.Context, id string) (res types.Mark, err error)
 	DeleteMark(ctx context.Context, id string) error
+	AvgMarks(ctx context.Context) (res []types.MarkAverege, err error)
 }
 
 type server struct {

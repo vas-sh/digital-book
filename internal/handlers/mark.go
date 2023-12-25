@@ -112,3 +112,25 @@ func (s *server) CreateMarks(rw http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+
+func (s *server) AvgMarks(rw http.ResponseWriter, r *http.Request) {
+
+	avgMark, err := s.repo.AvgMarks(r.Context())
+	if err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
+	}
+
+	if len(avgMark) == 0 {
+		http.Error(rw, "field is empty", http.StatusNotFound)
+		return
+	}
+
+	data := struct {
+		AvgMarks []types.MarkAverege
+	}{
+		AvgMarks: avgMark,
+	}
+	s.renderTemplate("html/AVG-marks.html", rw, data)
+
+}

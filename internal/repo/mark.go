@@ -35,3 +35,14 @@ func (r *repo) GetMark(ctx context.Context, id string) (res types.Mark, err erro
 	err = r.db.WithContext(ctx).Raw("SELECT * FROM mark WHERE id = ?", id).Scan(&res).Error
 	return
 }
+
+func (r *repo) AvgMarks(ctx context.Context) (res []types.MarkAverege, err error) {
+	err = r.db.WithContext(ctx).Raw(`
+    SELECT student.id, student.name, subject.title, AVG(value) AS Value
+    FROM mark 
+        INNER JOIN student ON mark.student_id = student.id
+        INNER JOIN subject ON mark.subject_id = subject.id
+        GROUP BY student.id, student.name, subject.title 
+        ORDER BY student.id ASC`).Scan(&res).Error
+	return
+}

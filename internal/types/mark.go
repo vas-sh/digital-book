@@ -14,7 +14,7 @@ type MarkResponse struct {
 	Value        int
 }
 
-type MrAverege struct {
+type MarkAverege struct {
 	ID    int
 	Name  string
 	Title string
