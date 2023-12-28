@@ -13,11 +13,6 @@ func (s *server) GetStudents(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(students) == 0 {
-		http.Error(rw, "no students", http.StatusNotFound)
-		return
-	}
-
 	data := struct {
 		Students []types.Student
 	}{

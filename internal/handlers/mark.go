@@ -13,11 +13,6 @@ func (s *server) GetMarks(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(marks) == 0 {
-		http.Error(rw, "no marks", http.StatusNotFound)
-		return
-	}
-
 	data := struct {
 		Marks []types.MarkResponse
 	}{
@@ -53,7 +48,7 @@ func (s *server) CreateMarks(rw http.ResponseWriter, r *http.Request) {
 		studentID := r.FormValue("student_id")
 		subjectID := r.FormValue("subject_id")
 		value := r.FormValue("value")
-		id := r.FormValue("id") ///
+		id := r.FormValue("id")
 		if id == "" || id == "0" {
 			log.Println("new mark: name", studentID, "lesson", subjectID, "point", value)
 			if err := s.repo.CreateMark(ctx, studentID, subjectID, value); err != nil {
@@ -118,11 +113,6 @@ func (s *server) AvgMarks(rw http.ResponseWriter, r *http.Request) {
 	avgMark, err := s.repo.AvgMarks(r.Context())
 	if err != nil {
 		http.Error(rw, err.Error(), 400)
-		return
-	}
-
-	if len(avgMark) == 0 {
-		http.Error(rw, "field is empty", http.StatusNotFound)
 		return
 	}
 
