@@ -33,7 +33,7 @@ func (s *server) CreateStudent(rw http.ResponseWriter, r *http.Request) {
 
 		if id == "" {
 			log.Println("new student: name", name, "class", class)
-			if err := s.repo.CreateStudent(ctx, name, class); err != nil {
+			if err := s.repo.CreateStudent(ctx, &types.Student{Name: name, Class: class}); err != nil {
 				http.Error(rw, err.Error(), 400)
 				return
 			}

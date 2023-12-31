@@ -32,7 +32,7 @@ func (s *server) CreateSubject(rw http.ResponseWriter, r *http.Request) {
 
 		if id == "" || id == "0" {
 			log.Println("new subject: title", title)
-			if err := s.repo.CreateSubject(ctx, title); err != nil {
+			if err := s.repo.CreateSubject(ctx, &types.Subject{Title: title}); err != nil {
 				http.Error(rw, err.Error(), 400)
 				return
 			}

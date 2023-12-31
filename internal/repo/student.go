@@ -10,8 +10,8 @@ func (r *repo) GetStudents(ctx context.Context) (res []types.Student, err error)
 	return
 }
 
-func (r *repo) CreateStudent(ctx context.Context, name, class string) error {
-	return r.db.WithContext(ctx).Exec("INSERT INTO student (name, class) VALUES (?, ?)", name, class).Error
+func (r *repo) CreateStudent(ctx context.Context, student *types.Student) error {
+	return r.db.WithContext(ctx).Create(student).Error
 }
 
 func (r *repo) UpdateStudent(ctx context.Context, name, class, id string) error {

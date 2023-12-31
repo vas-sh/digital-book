@@ -10,8 +10,8 @@ func (r *repo) GetSubjects(ctx context.Context) (res []types.Subject, err error)
 	return
 }
 
-func (r *repo) CreateSubject(ctx context.Context, title string) error {
-	return r.db.WithContext(ctx).Exec("INSERT INTO subject (ID, title) VALUES(DEFAULT, ?)", title).Error
+func (r *repo) CreateSubject(ctx context.Context, subject *types.Subject) error {
+	return r.db.WithContext(ctx).Create(subject).Error
 }
 
 func (r *repo) UpdateSubject(ctx context.Context, title, id string) error {
