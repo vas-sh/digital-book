@@ -20,8 +20,9 @@ type repo interface {
 	GetSubjects(ctx context.Context) (res []types.Subject, err error)
 	UpdateSubject(ctx context.Context, title, id string) error
 	DeleteSubject(ctx context.Context, id string) error
+	GetSubject(ctx context.Context, id string) (res types.Subject, err error)
 
-	CreateMark(ctx context.Context, studentID, subjectID, value string) error
+	CreateMark(ctx context.Context, mark *types.Mark) error
 	UpdateMark(ctx context.Context, studentID, subjectID, value, id string) error
 	GetMarks(ctx context.Context) (res []types.MarkResponse, err error)
 	GetMark(ctx context.Context, id string) (res types.Mark, err error)

@@ -1,6 +1,6 @@
 package types
 
 type Subject struct {
-	ID    int
+	ID    int `gorm:"primary_key"`
 	Title string
 }

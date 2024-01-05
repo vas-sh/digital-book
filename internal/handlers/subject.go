@@ -49,14 +49,10 @@ func (s *server) CreateSubject(rw http.ResponseWriter, r *http.Request) {
 
 	case http.MethodGet:
 		if id := r.URL.Query().Get("id"); id != "" {
-			subjects, err := s.repo.GetSubjects(ctx)
+			subject, err := s.repo.GetSubject(ctx, id)
 			if err != nil {
 				http.Error(rw, err.Error(), 400)
 				return
-			}
-			var subject types.Subject
-			if len(subjects) > 0 {
-				subject = subjects[0]
 			}
 
 			s.renderTemplate("html/update-subject.html", rw, struct {

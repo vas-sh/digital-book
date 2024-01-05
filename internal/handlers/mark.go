@@ -4,6 +4,7 @@ import (
 	"digital-book/internal/types"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func (s *server) GetMarks(rw http.ResponseWriter, r *http.Request) {
@@ -49,9 +50,28 @@ func (s *server) CreateMarks(rw http.ResponseWriter, r *http.Request) {
 		subjectID := r.FormValue("subject_id")
 		value := r.FormValue("value")
 		id := r.FormValue("id")
+
 		if id == "" || id == "0" {
-			log.Println("new mark: name", studentID, "lesson", subjectID, "point", value)
-			if err := s.repo.CreateMark(ctx, studentID, subjectID, value); err != nil {
+			log.Println("new mark: student_id", studentID, "subject_id", subjectID, "value", value)
+			studentIDInt, err := strconv.Atoi(studentID)
+			if err != nil {
+				http.Error(rw, "Invalid student ID format", http.StatusBadRequest)
+				return
+			}
+
+			subjectIDInt, err := strconv.Atoi(subjectID)
+			if err != nil {
+				http.Error(rw, "Invalid subject ID format", http.StatusBadRequest)
+				return
+			}
+
+			valueInt, err := strconv.Atoi(value)
+			if err != nil {
+				http.Error(rw, "Invalid value format", http.StatusBadRequest)
+				return
+			}
+
+			if err := s.repo.CreateMark(ctx, &types.Mark{StudentID: studentIDInt, SubjectID: subjectIDInt, Value: valueInt}); err != nil {
 				http.Error(rw, err.Error(), 400)
 				return
 			}
