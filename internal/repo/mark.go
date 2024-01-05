@@ -5,15 +5,15 @@ import (
 	"digital-book/internal/types"
 )
 
-func (r *repo) CreateMark(ctx context.Context, mark *types.Mark) error { // при можливості виправити
+func (r *repo) CreateMark(ctx context.Context, mark *types.Mark) error {
 	return r.db.WithContext(ctx).Create(mark).Error
 }
 
-func (r *repo) UpdateMark(ctx context.Context, studentID, subjectID, value, id string) error { //done
+func (r *repo) UpdateMark(ctx context.Context, studentID, subjectID, value, id string) error {
 	return r.db.WithContext(ctx).Model(&types.Mark{}).Where("id = ?", id).Updates(map[string]interface{}{"StudentID": studentID, "SubjectID": subjectID, "Value": value}).Error
 }
 
-func (r *repo) GetMarks(ctx context.Context) (res []types.MarkResponse, err error) { //don`t touch
+func (r *repo) GetMarks(ctx context.Context) (res []types.MarkResponse, err error) {
 	err = r.db.WithContext(ctx).Raw(`
        SELECT mark.id, student.name as student_name, subject.title as subject_title, mark.value 
         FROM mark
@@ -25,16 +25,16 @@ func (r *repo) GetMarks(ctx context.Context) (res []types.MarkResponse, err erro
 	return
 }
 
-func (r *repo) DeleteMark(ctx context.Context, id string) error { //done
+func (r *repo) DeleteMark(ctx context.Context, id string) error {
 	return r.db.WithContext(ctx).Where("id = ?", id).Delete(&types.Mark{}).Error
 }
 
-func (r *repo) GetMark(ctx context.Context, id string) (res types.Mark, err error) { //done
+func (r *repo) GetMark(ctx context.Context, id string) (res types.Mark, err error) {
 	err = r.db.WithContext(ctx).Where("id = ?", id).First(&res).Error
 	return
 }
 
-func (r *repo) AvgMarks(ctx context.Context) (res []types.MarkAverege, err error) { //don't touch
+func (r *repo) AvgMarks(ctx context.Context) (res []types.MarkAverege, err error) {
 	err = r.db.WithContext(ctx).Raw(`
     SELECT student.id, student.name, subject.title, AVG(value) AS Value
     FROM mark 
