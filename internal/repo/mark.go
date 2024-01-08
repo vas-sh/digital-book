@@ -10,7 +10,7 @@ func (r *repo) CreateMark(ctx context.Context, mark *types.Mark) error {
 }
 
 func (r *repo) UpdateMark(ctx context.Context, studentID, subjectID, value, id string) error {
-	return r.db.WithContext(ctx).Model(&types.Mark{}).Where("id = ?", id).Updates(map[string]interface{}{"StudentID": studentID, "SubjectID": subjectID, "Value": value}).Error
+	return r.db.WithContext(ctx).Model(&types.Mark{}).Where("id = ?", id).Updates(map[string]any{"student_id": studentID, "subject_id": subjectID, "value": value}).Error
 }
 
 func (r *repo) GetMarks(ctx context.Context) (res []types.MarkResponse, err error) {
