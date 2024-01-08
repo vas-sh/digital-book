@@ -1,19 +1,19 @@
 package main
 
 import (
+	"digital-book/internal/config"
 	"digital-book/internal/handlers"
 	"digital-book/internal/repo"
+	"digital-book/internal/service"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 )
 
-const dsn = "host=localhost user=user password=1111 dbname=test port=5432 sslmode=disable TimeZone=Europe/Kiev"
-
 func main() {
 	var err error
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+	db, err := gorm.Open(postgres.Open(config.Config.DSN), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
 		},
@@ -23,6 +23,7 @@ func main() {
 	}
 
 	rep := repo.New(db)
-	server := handlers.New(rep)
+	srv := service.New(rep)
+	server := handlers.New(rep, srv)
 	server.Run()
 }

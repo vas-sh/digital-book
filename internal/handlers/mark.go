@@ -8,7 +8,7 @@ import (
 )
 
 func (s *server) GetMarks(rw http.ResponseWriter, r *http.Request) {
-	marks, err := s.repo.GetMarks(r.Context())
+	marks, err := s.srv.GetMarks(r.Context())
 	if err != nil {
 		http.Error(rw, err.Error(), 400)
 		return
@@ -34,7 +34,7 @@ func (s *server) DeleteMark(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "id is required", http.StatusBadRequest)
 		return
 	}
-	if err := s.repo.DeleteMark(ctx, id); err != nil {
+	if err := s.srv.DeleteMark(ctx, id); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
