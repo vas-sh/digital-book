@@ -7,7 +7,7 @@ import (
 )
 
 func (s *server) GetSubjects(rw http.ResponseWriter, r *http.Request) {
-	subjects, err := s.repo.GetSubjects(r.Context())
+	subjects, err := s.srv.GetSubjects(r.Context())
 	if err != nil {
 		http.Error(rw, err.Error(), 400)
 		return
@@ -38,7 +38,7 @@ func (s *server) CreateSubject(rw http.ResponseWriter, r *http.Request) {
 			}
 		} else {
 			log.Println("update subject: title", title, "id", id)
-			if err := s.repo.UpdateSubject(ctx, title, id); err != nil {
+			if err := s.srv.UpdateSubject(ctx, title, id); err != nil {
 				http.Error(rw, err.Error(), 400)
 				return
 			}
@@ -77,7 +77,7 @@ func (s *server) DeleteSubject(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, "id is required", http.StatusBadRequest)
 		return
 	}
-	if err := s.repo.DeleteSubject(ctx, id); err != nil {
+	if err := s.srv.DeleteSubject(ctx, id); err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
 	}

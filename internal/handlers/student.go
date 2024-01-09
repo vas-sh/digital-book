@@ -7,7 +7,7 @@ import (
 )
 
 func (s *server) GetStudents(rw http.ResponseWriter, r *http.Request) {
-	students, err := s.repo.GetStudents(r.Context())
+	students, err := s.srv.GetStudents(r.Context())
 	if err != nil {
 		http.Error(rw, err.Error(), 400)
 		return
@@ -33,13 +33,13 @@ func (s *server) CreateStudent(rw http.ResponseWriter, r *http.Request) {
 
 		if id == "" {
 			log.Println("new student: name", name, "class", class)
-			if err := s.repo.CreateStudent(ctx, &types.Student{Name: name, Class: class}); err != nil {
+			if err := s.srv.CreateStudent(ctx, &types.Student{Name: name, Class: class}); err != nil {
 				http.Error(rw, err.Error(), 400)
 				return
 			}
 		} else {
 			log.Println("update student: name", name, "class", class, "id", id)
-			if err := s.repo.UpdateStudent(ctx, name, class, id); err != nil {
+			if err := s.srv.UpdateStudent(ctx, name, class, id); err != nil {
 				http.Error(rw, err.Error(), 400)
 				return
 			}
@@ -50,7 +50,7 @@ func (s *server) CreateStudent(rw http.ResponseWriter, r *http.Request) {
 
 	case http.MethodGet:
 		if id := r.URL.Query().Get("id"); id != "" {
-			student, err := s.repo.GetStudent(ctx, id)
+			student, err := s.srv.GetStudent(ctx, id)
 			if err != nil {
 				http.Error(rw, err.Error(), 400)
 				return
@@ -77,7 +77,7 @@ func (s *server) DeleteStudent(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "id is required", http.StatusBadRequest)
 		return
 	}
-	if err := s.repo.DeleteStudent(ctx, id); err != nil {
+	if err := s.srv.DeleteStudent(ctx, id); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

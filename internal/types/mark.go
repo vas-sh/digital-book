@@ -1,21 +1,21 @@
 package types
 
 type Mark struct {
-	ID        int `gorm:"primary_key"`
+	ID        int
 	StudentID int
 	SubjectID int
 	Value     int
 }
 
 type MarkResponse struct {
-	ID           int `gorm:"primary_key"`
+	ID           int
 	StudentName  string
 	SubjectTitle string
 	Value        int
 }
 
 type MarkAverege struct {
-	ID    int `gorm:"primary_key"`
+	ID    int
 	Name  string
 	Title string
 	Value float64

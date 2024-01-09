@@ -71,13 +71,13 @@ func (s *server) CreateMarks(rw http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			if err := s.repo.CreateMark(ctx, &types.Mark{StudentID: studentIDInt, SubjectID: subjectIDInt, Value: valueInt}); err != nil {
+			if err := s.srv.CreateMark(ctx, &types.Mark{StudentID: studentIDInt, SubjectID: subjectIDInt, Value: valueInt}); err != nil {
 				http.Error(rw, err.Error(), 400)
 				return
 			}
 		} else {
 			log.Println("update mark: student_id", studentID, "subject_id", subjectID, "value", value, "id", id)
-			if err := s.repo.UpdateMark(ctx, studentID, subjectID, value, id); err != nil {
+			if err := s.srv.UpdateMark(ctx, studentID, subjectID, value, id); err != nil {
 				http.Error(rw, err.Error(), 400)
 				return
 			}
@@ -88,20 +88,20 @@ func (s *server) CreateMarks(rw http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		id := r.URL.Query().Get("id")
 
-		subjects, err := s.repo.GetSubjects(ctx)
+		subjects, err := s.srv.GetSubjects(ctx)
 		if err != nil {
 			http.Error(rw, err.Error(), 400)
 			return
 		}
 
-		students, err := s.repo.GetStudents(ctx)
+		students, err := s.srv.GetStudents(ctx)
 		if err != nil {
 			http.Error(rw, err.Error(), 400)
 			return
 		}
 
 		if id != "" {
-			mark, err := s.repo.GetMark(ctx, id)
+			mark, err := s.srv.GetMark(ctx, id)
 			if err != nil {
 				http.Error(rw, err.Error(), 400)
 				return
@@ -130,7 +130,7 @@ func (s *server) CreateMarks(rw http.ResponseWriter, r *http.Request) {
 
 func (s *server) AvgMarks(rw http.ResponseWriter, r *http.Request) {
 
-	avgMark, err := s.repo.AvgMarks(r.Context())
+	avgMark, err := s.srv.AvgMarks(r.Context())
 	if err != nil {
 		http.Error(rw, err.Error(), 400)
 		return
