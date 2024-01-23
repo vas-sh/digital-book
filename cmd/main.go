@@ -23,6 +23,9 @@ func main() {
 	}
 
 	rep := repo.New(db)
+	if err := rep.Migrate(); err != nil {
+		panic(err)
+	}
 	srv := service.New(rep)
 	server := handlers.New(rep, srv)
 	server.Run()
