@@ -3,6 +3,7 @@ module digital-book
 go 1.18
 
 require (
+	github.com/google/go-cmp v0.6.0
 	gorm.io/driver/postgres v1.5.3
 	gorm.io/gorm v1.25.5
 )

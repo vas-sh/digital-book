@@ -5,6 +5,8 @@ import (
 	"digital-book/internal/types"
 	"fmt"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestCreateStudent(t *testing.T) {
@@ -44,10 +46,10 @@ func TestUpdateStudent(t *testing.T) {
 			return
 		}
 
-		updatedName := "John"
-		updatedClass := "11"
+		created.Name = "John"
+		created.Class = "11"
 
-		if err := s.UpdateStudent(ctx, updatedName, updatedClass, fmt.Sprint(created.ID)); err != nil {
+		if err := s.UpdateStudent(ctx, created.Name, created.Class, fmt.Sprint(created.ID)); err != nil {
 			t.Errorf("error updating student: " + err.Error())
 			return
 		}
@@ -58,8 +60,8 @@ func TestUpdateStudent(t *testing.T) {
 			return
 		}
 
-		if student.Name != updatedName || student.Class != updatedClass {
-			t.Errorf("invalid name, class after update: want %s, %s, got %s, %s", updatedName, updatedClass, student.Name, student.Class)
+		if student != created {
+			t.Errorf("invalid update: %s", cmp.Diff(student, created))
 			return
 		}
 	})

@@ -23,7 +23,7 @@ func TestCreateSubject(t *testing.T) {
 			t.Errorf("subject is not created: " + err.Error())
 			return
 		}
-		if subject.Title != created.Title {
+		if subject != created {
 			t.Errorf("invalid title: want %s, got %s", created.Title, subject.Title)
 			return
 		}
