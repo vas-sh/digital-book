@@ -46,16 +46,16 @@ func (s *server) CreateMarks(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	switch r.Method {
 	case http.MethodPost:
-		studentID := r.FormValue("student_id")
+		userID := r.FormValue("user_id")
 		subjectID := r.FormValue("subject_id")
 		value := r.FormValue("value")
 		id := r.FormValue("id")
 
 		if id == "" || id == "0" {
-			log.Println("new mark: student_id", studentID, "subject_id", subjectID, "value", value)
-			studentIDInt, err := strconv.Atoi(studentID)
+			log.Println("new mark: user_id", userID, "subject_id", subjectID, "value", value)
+			userIDInt, err := strconv.Atoi(userID)
 			if err != nil {
-				http.Error(rw, "Invalid student ID format", http.StatusBadRequest)
+				http.Error(rw, "Invalid user ID format", http.StatusBadRequest)
 				return
 			}
 
@@ -71,13 +71,13 @@ func (s *server) CreateMarks(rw http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			if err := s.srv.CreateMark(ctx, &types.Mark{StudentID: studentIDInt, SubjectID: subjectIDInt, Value: valueInt}); err != nil {
+			if err := s.srv.CreateMark(ctx, &types.Mark{UserID: userIDInt, SubjectID: subjectIDInt, Value: valueInt}); err != nil {
 				http.Error(rw, err.Error(), 400)
 				return
 			}
 		} else {
-			log.Println("update mark: student_id", studentID, "subject_id", subjectID, "value", value, "id", id)
-			if err := s.srv.UpdateMark(ctx, studentID, subjectID, value, id); err != nil {
+			log.Println("update mark: user_id", userID, "subject_id", subjectID, "value", value, "id", id)
+			if err := s.srv.UpdateMark(ctx, userID, subjectID, value, id); err != nil {
 				http.Error(rw, err.Error(), 400)
 				return
 			}
@@ -94,7 +94,7 @@ func (s *server) CreateMarks(rw http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		students, err := s.srv.GetStudents(ctx)
+		users, err := s.srv.GetUsers(ctx)
 		if err != nil {
 			http.Error(rw, err.Error(), 400)
 			return
@@ -109,19 +109,19 @@ func (s *server) CreateMarks(rw http.ResponseWriter, r *http.Request) {
 
 			s.renderTemplate("html/update-mark.html", rw, struct {
 				Mark     types.Mark
-				Students []types.Student
+				Users    []types.User
 				Subjects []types.Subject
 			}{
 				Mark:     mark,
-				Students: students,
+				Users:    users,
 				Subjects: subjects,
 			})
 		} else {
 			s.renderTemplate("html/create-mark.html", rw, struct {
-				Students []types.Student
+				Users    []types.User
 				Subjects []types.Subject
 			}{
-				Students: students,
+				Users:    users,
 				Subjects: subjects,
 			})
 		}

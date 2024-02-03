@@ -2,14 +2,14 @@ package types
 
 type Mark struct {
 	ID        int
-	StudentID int
+	UserID    int
 	SubjectID int
 	Value     int
 }
 
 type MarkResponse struct {
 	ID           int
-	StudentName  string
+	UserName     string
 	SubjectTitle string
 	Value        int
 }

@@ -1,7 +1,7 @@
 {{define "content"}}
 <div>
     <div>
-        <a href="/students/create-new" class="add-button">Add student</a>
+        <a href="/users/create-new" class="add-button">Add user</a>
     </div>
 </div>
 <table>
@@ -9,17 +9,19 @@
         <tr>
             <th>ID</th>
             <th>Name</th>
+            <th>Login</th>
             <th>Class</th>
             <th>Delete</th>
         </tr>
     </thead>
     <tbody>
-        {{range .Students}}
-            <tr onclick="window.location.href = '/students/create-new?id={{.ID}}'">
+        {{range .Users}}
+            <tr onclick="window.location.href = '/users/create-new?id={{.ID}}'">
                 <td>{{.ID}}</td>
                 <td>{{.Name}}</td>
+                <td>{{.Login}}</td>
                 <td>{{.Class}}</td>
-                <td><a href="/students/delete?id={{ .ID }}">Delete</a></td>
+                <td><a href="/users/delete?id={{ .ID }}">Delete</a></td>
             </tr>
         {{end}}
     </tbody>

@@ -6,11 +6,11 @@ import (
 )
 
 type repo interface {
-	CreateStudent(ctx context.Context, student *types.Student) error
-	GetStudents(ctx context.Context) (res []types.Student, err error)
-	GetStudent(ctx context.Context, id string) (res types.Student, err error)
-	UpdateStudent(ctx context.Context, name, class, id string) error
-	DeleteStudent(ctx context.Context, id string) error
+	CreateUser(ctx context.Context, user *types.User) error
+	GetUsers(ctx context.Context) (res []types.User, err error)
+	GetUser(ctx context.Context, id string) (res types.User, err error)
+	UpdateUser(ctx context.Context, name, class, id, login string) error
+	DeleteUser(ctx context.Context, id string) error
 
 	CreateSubject(ctx context.Context, subject *types.Subject) error
 	GetSubjects(ctx context.Context) (res []types.Subject, err error)
@@ -19,7 +19,7 @@ type repo interface {
 	GetSubject(ctx context.Context, id string) (res types.Subject, err error)
 
 	CreateMark(ctx context.Context, mark *types.Mark) error
-	UpdateMark(ctx context.Context, studentID, subjectID, value, id string) error
+	UpdateMark(ctx context.Context, userID, subjectID, value, id string) error
 	GetMarks(ctx context.Context) (res []types.MarkResponse, err error)
 	GetMark(ctx context.Context, id string) (res types.Mark, err error)
 	DeleteMark(ctx context.Context, id string) error

@@ -1,6 +1,6 @@
 {{define "content"}}
-<form method="POST" action="/students/create-new">
-  <h2>Add a new student</h2>
+<form method="POST" action="/users/create-new">
+  <h2>Add a new user</h2>
 
   <label>Name: </label>
   <input required name="name" type="text" />
@@ -9,6 +9,11 @@
 
   <label>Class: </label>
   <input required name="class" type="number" />
+
+  <br>
+
+  <label>Login: </label>
+  <input required name="login" type="text" />
 
   <br>
 

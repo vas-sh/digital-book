@@ -8,7 +8,7 @@
     <thead>
         <tr>
             <th>ID</th>
-            <th>NameStudent</th>
+            <th>NameUser</th>
             <th>Subject</th>
             <th>Value</th>
             <th>Delete</th>
@@ -18,7 +18,7 @@
         {{range .Marks}}
             <tr onclick="window.location.href = '/marks/create-new?id={{.ID}}'">
                 <td>{{.ID}}</td>
-                <td>{{.StudentName}}</td>
+                <td>{{.UserName}}</td>
                 <td>{{.SubjectTitle}}</td>
                 <td>{{.Value}}</td>
                 <td><a href="/marks/delete?id={{ .ID }}">Delete</a></td>

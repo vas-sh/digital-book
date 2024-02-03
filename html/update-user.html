@@ -1,0 +1,22 @@
+{{define "content"}}
+<form method="POST" action="/users/create-new">
+  <h2>Update {{.User.Name }}, {{.User.Class }}</h2>
+
+  <label>Name: </label>
+  <input required name="name" type="text" value="{{.User.Name}}" />
+  <br>
+
+  <label>Login: </label>
+  <input required name="login" type="text" value="{{.User.Login}}" />
+  <br>
+
+  <label>Class: </label>
+  <input required name="class" type="text" value="{{.User.Class}}" />
+  <br>
+
+  <input hidden name="id" type="text" value="{{.User.ID}}"/>
+  <br>
+
+  <button type="submit">Update</button>
+</form>
+{{end}}

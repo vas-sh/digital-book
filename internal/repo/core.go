@@ -17,7 +17,7 @@ func New(db *gorm.DB) *repo {
 }
 
 func (r *repo) Migrate() error {
-	for _, table := range []any{types.Student{}, types.Mark{}, types.Subject{}} {
+	for _, table := range []any{types.User{}, types.Mark{}, types.Subject{}} {
 		if err := r.db.AutoMigrate(table); err != nil {
 			return err
 		}

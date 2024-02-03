@@ -10,11 +10,11 @@ import (
 )
 
 type service interface {
-	CreateStudent(ctx context.Context, student *types.Student) error
-	GetStudents(ctx context.Context) (res []types.Student, err error)
-	GetStudent(ctx context.Context, id string) (res types.Student, err error)
-	DeleteStudent(ctx context.Context, id string) error
-	UpdateStudent(ctx context.Context, name, class, id string) error
+	CreateUser(ctx context.Context, user *types.User) error
+	GetUsers(ctx context.Context) (res []types.User, err error)
+	GetUser(ctx context.Context, id string) (res types.User, err error)
+	DeleteUser(ctx context.Context, id string) error
+	UpdateUser(ctx context.Context, name, class, id, login string) error
 
 	CreateSubject(ctx context.Context, subject *types.Subject) error
 	GetSubject(ctx context.Context, id string) (res types.Subject, err error)
@@ -26,7 +26,7 @@ type service interface {
 	GetMark(ctx context.Context, id string) (res types.Mark, err error)
 	DeleteMark(ctx context.Context, id string) error
 	CreateMark(ctx context.Context, mark *types.Mark) error
-	UpdateMark(ctx context.Context, studentID, subjectID, value, id string) error
+	UpdateMark(ctx context.Context, userID, subjectID, value, id string) error
 	AvgMarks(ctx context.Context) (res []types.MarkAverege, err error)
 }
 
@@ -56,9 +56,9 @@ func (s *server) Run() {
 	http.HandleFunc("/subjects/create-new", s.CreateSubject)
 	http.HandleFunc("/subjects/delete", s.DeleteSubject)
 
-	http.HandleFunc("/students/create-new", s.CreateStudent)
-	http.HandleFunc("/students", s.GetStudents)
-	http.HandleFunc("/students/delete", s.DeleteStudent)
+	http.HandleFunc("/users/create-new", s.CreateUser)
+	http.HandleFunc("/users", s.GetUsers)
+	http.HandleFunc("/users/delete", s.DeleteUser)
 
 	log.Println("start")
 	http.ListenAndServe(":5005", nil)

@@ -5,6 +5,8 @@ import (
 	"digital-book/internal/types"
 	"fmt"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestCreateSubject(t *testing.T) {
@@ -45,18 +47,18 @@ func TestUpdateSubject(t *testing.T) {
 		updatedTitle := "biology"
 
 		if err := s.UpdateSubject(ctx, updatedTitle, fmt.Sprint(created.ID)); err != nil {
-			t.Errorf("error updating student: " + err.Error())
+			t.Errorf("error updating user: " + err.Error())
 			return
 		}
 
 		subject, err := s.GetSubject(ctx, fmt.Sprint(created.ID))
 		if err != nil {
-			t.Errorf("error getting student: " + err.Error())
+			t.Errorf("error getting user: " + err.Error())
 			return
 		}
 
 		if subject.Title != updatedTitle {
-			t.Errorf("invalid title after update: want %s got %s", updatedTitle, subject.Title)
+			t.Errorf("invalid title after update: %s", cmp.Diff(subject, created))
 			return
 		}
 	})
@@ -67,14 +69,16 @@ func TestDeleteSubject(t *testing.T) {
 
 	runInTransaction(func(s srv) {
 		created := types.Subject{
-			Title: "Math",
-		}
+			Title: "Math"}
 
+		if err := s.CreateSubject(ctx, &created); err != nil {
+			t.Errorf("subject is not created: " + err.Error())
+			return
+		}
 		if err := s.DeleteSubject(ctx, fmt.Sprint(created.ID)); err != nil {
 			t.Errorf("delete failed: %v", err)
 			return
 		}
-
 		subject, err := s.GetSubject(ctx, fmt.Sprint(created.ID))
 		if err == nil {
 			t.Errorf("subject should be deleted, but it still exists: %+v", subject)

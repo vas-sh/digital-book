@@ -3,8 +3,8 @@
   <h2>Add a new mark</h2>
 
   <label>Name: </label>
-  <select name="student_id">
-    {{range .Students }}
+  <select name="user_id">
+    {{range .Users }}
       <option value="{{ .ID }}">{{ .Name }}</option>
     {{end}}
   </select>

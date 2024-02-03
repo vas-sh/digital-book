@@ -2,10 +2,10 @@
 <form method="POST" action="/marks/create-new">
   <h2>Update </h2>
   <label>Name: </label>
-  <select name="student_id" >
-    {{ $studentID := .Mark.StudentID }}
-    {{range .Students }}
-      <option {{ if eq .ID $studentID }} selected {{ end }} value="{{ .ID }}">{{ .Name }}</option>
+  <select name="user_id" >
+    {{ $userID := .Mark.UserID }}
+    {{range .Users }}
+      <option {{ if eq .ID $userID }} selected {{ end }} value="{{ .ID }}">{{ .Name }}</option>
     {{end}}
   </select>
 
